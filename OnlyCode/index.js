@@ -148,6 +148,9 @@ async function Start() {
     }
 
     console.log(`Likes e Rt realizados! TweetsCount = ${tweetsCount}`);
+    
 }
 
 Start();
+
+return true
