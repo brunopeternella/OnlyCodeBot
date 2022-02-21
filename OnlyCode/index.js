@@ -99,37 +99,29 @@ async function retweet(tweetId) {
     }
 }
 
-async function Start() {    
-    var tweets = []
+async function Start() {
+    var tweet
     var tweetsCount = 0
-    var body
     var isLiked
 
-    for(var language of languages){      
+    for (var language of languages) {
         console.log(`Linguagem escolhida: ${language}`)
 
-            await query(language).then(res => {
-                body = JSON.parse(res.body)
-                tweets.push(res.body.data[0])
-                tweets.push(res.body.data[1])
-            });
-            
-            body.data.forEach(tweet => {
-                tweetsCount++
-                tweets.push(tweet)
-            });
-        
-            for (const tweet of tweets) {
-                await like(tweet.id).then(res => {
-                    isLiked = res.body.data.liked
-                    console.log(`Tweet id: ${tweet.id} ${isLiked} liked`)
-                })
-        
-                await retweet(tweet.id).then(() => {
-                    console.log('e retweeted!')
-                })
-                console.log()
-            }    
+        await query(language).then(res => {
+            tweet = JSON.parse(res.body.data[0])
+            tweetsCount++
+        });
+
+        await like(tweet.id).then(res => {
+            isLiked = res.body.data.liked
+            console.log(`Tweet id: ${tweet.id} ${isLiked} liked`)
+        })
+
+        await retweet(tweet.id).then(() => {
+            console.log('e retweeted!')
+        })
+        console.log()
+
     }
 
     console.log(`Likes e Rt realizados! TweetsCount = ${tweetsCount}`);
