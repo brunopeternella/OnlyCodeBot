@@ -3,6 +3,8 @@ const crypto = require('crypto')
 const OAuth = require('oauth-1.0a')
 const got = require('got')
 const languages = require('./languages.json').languages.split(',')
+const body = require('./aaaa.json')
+
 
 const consumerKeys = {
     key: process.env.CONSUMER_KEY,
@@ -103,12 +105,14 @@ async function Start() {
     var tweet
     var tweetsCount = 0
     var isLiked
+    var body
 
     for (var language of languages) {
         console.log(`Linguagem escolhida: ${language}`)
 
         await query(language).then(res => {
-            tweet = JSON.parse(res.body.data[0])
+            body = JSON.parse(res.body)
+            tweet = body.data[0]
             tweetsCount++
         });
 
@@ -120,8 +124,6 @@ async function Start() {
         await retweet(tweet.id).then(() => {
             console.log('e retweeted!')
         })
-        console.log()
-
     }
 
     console.log(`Likes e Rt realizados! TweetsCount = ${tweetsCount}`);
