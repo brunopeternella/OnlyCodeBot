@@ -3,8 +3,6 @@ const crypto = require('crypto')
 const OAuth = require('oauth-1.0a')
 const got = require('got')
 const languages = require('./languages.json').languages.split(',')
-const body = require('./aaaa.json')
-
 
 const consumerKeys = {
     key: process.env.CONSUMER_KEY,
@@ -29,7 +27,7 @@ const oauth = OAuth({
 
 async function query(language) {
     try {
-        const _url = `${process.env.QUERY_ENDPOINT}query=${language}`;
+        const _url = `${process.env.QUERY_ENDPOINT}query=${language}&tweet.fields=lang&expansions=author_id`;
 
         const authHeader = oauth.toHeader(oauth.authorize({
             url: _url,
@@ -106,15 +104,38 @@ async function Start() {
     var tweetsCount = 0
     var isLiked
     var body
+    var tweets
+    var index
 
     for (var language of languages) {
         console.log(`Linguagem escolhida: ${language}`)
 
         await query(language).then(res => {
             body = JSON.parse(res.body)
-            tweet = body.data[0]
-            tweetsCount++
+            tweets = body.data
         });
+
+        for (var i = 0; i < tweets.length; i++) {
+            if (tweets[i].lang !== 'en' && tweets[i].lang !== 'pt') {
+                index = tweets.indexOf(tweets[i])
+                tweets.splice(index, 1)
+            }
+        }
+
+        for (var i = 0; i < tweets.length; i++) {
+            if (tweets[i].lang === 'pt') {
+                tweet = tweets[i]
+            }
+        }
+
+        if (tweet != undefined) {
+            tweetsCount++
+        } else {
+            tweets.sort((a, b) => {
+                return a - b
+            })
+            tweet = tweets[0]
+        }
 
         await like(tweet.id).then(res => {
             isLiked = res.body.data.liked
