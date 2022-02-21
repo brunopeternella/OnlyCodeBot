@@ -2,7 +2,7 @@ require('dotenv').config()
 const crypto = require('crypto')
 const OAuth = require('oauth-1.0a')
 const got = require('got')
-const languages = require('./languages.json').languages.split(',').toString()
+const languages = require('./languages.json').languages.split(',')
 
 const consumerKeys = {
     key: process.env.CONSUMER_KEY,
@@ -27,7 +27,7 @@ const oauth = OAuth({
 
 async function query(language) {
     try {
-        const _url = `${process.env.QUERY_ENDPOINT}query=${language}&max_results=11`;
+        const _url = `${process.env.QUERY_ENDPOINT}query=${language}`;
 
         const authHeader = oauth.toHeader(oauth.authorize({
             url: _url,
@@ -99,36 +99,37 @@ async function retweet(tweetId) {
     }
 }
 
-async function Start() {
+async function Start() {    
     var tweets = []
     var tweetsCount = 0
-    var totalTweets
     var body
     var isLiked
-    
-    await query("JavaScript").then(res => {
-        body = JSON.parse(res.body)
-    });
 
-    body.data.forEach(tweet => {
-        tweetsCount++
-        tweets.push(tweet)
-    });
-
-    totalTweets = tweetsCount
-
-    for (const tweet of tweets) {
-        await like(tweet.id).then(res => {
-            isLiked = res.body.data.liked
-            console.log(`Tweet id: ${tweet.id} recebeu like? ${isLiked}!`)
-        })
-
-        await retweet(tweet.id).then(res => {
-            console.log(`Tweet id: ${tweet.id} retweeted!`)
-        })
-        console.log()
+    for(var language of languages){
+        for(var i=0; i<3; i++){
+            await query(language).then(res => {
+                body = JSON.parse(res.body)
+            });
+        
+            body.data.forEach(tweet => {
+                tweetsCount++
+                tweets.push(tweet)
+            });
+        
+            for (const tweet of tweets) {
+                await like(tweet.id).then(res => {
+                    isLiked = res.body.data.liked
+                    console.log(`Tweet id: ${tweet.id} recebeu like? ${isLiked}!`)
+                })
+        
+                await retweet(tweet.id).then(() => {
+                    console.log(`Tweet id: ${tweet.id} retweeted!`)
+                })
+                console.log()
+            }
+        }
     }
-
+    
     console.log(`Likes e Rt realizados! TweetsCount = ${totalTweets}`);
 }
 
