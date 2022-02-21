@@ -105,12 +105,8 @@ async function Start() {
     var totalTweets
     var body
     var isLiked
-
-    //como definir palavras? KKKKKKKKKKKKKKKKKK
-    //10 like e rt em cada palavra?
-    //é massa, n precisa usar o next_token
     
-    /*await query("JavaScript").then(res => {
+    await query("JavaScript").then(res => {
         body = JSON.parse(res.body)
     });
 
@@ -133,10 +129,7 @@ async function Start() {
         console.log()
     }
 
-    console.log(`Likes e Rt realizados! TweetsCount = ${totalTweets}`);*/
-
-    //console.log(languages);
+    console.log(`Likes e Rt realizados! TweetsCount = ${totalTweets}`);
 }
 
-//fazer ele rodar com timeset?
 Start();
