@@ -105,12 +105,15 @@ async function Start() {
     var body
     var isLiked
 
-    for(var language of languages){
-        for(var i=0; i<3; i++){
+    for(var language of languages){      
+        console.log(`Linguagem escolhida: ${language}`)
+
             await query(language).then(res => {
                 body = JSON.parse(res.body)
+                tweets.push(res.body.data[0])
+                tweets.push(res.body.data[1])
             });
-        
+            
             body.data.forEach(tweet => {
                 tweetsCount++
                 tweets.push(tweet)
@@ -119,18 +122,17 @@ async function Start() {
             for (const tweet of tweets) {
                 await like(tweet.id).then(res => {
                     isLiked = res.body.data.liked
-                    console.log(`Tweet id: ${tweet.id} recebeu like? ${isLiked}!`)
+                    console.log(`Tweet id: ${tweet.id} ${isLiked} liked`)
                 })
         
                 await retweet(tweet.id).then(() => {
-                    console.log(`Tweet id: ${tweet.id} retweeted!`)
+                    console.log('e retweeted!')
                 })
                 console.log()
-            }
-        }
+            }    
     }
-    
-    console.log(`Likes e Rt realizados! TweetsCount = ${totalTweets}`);
+
+    console.log(`Likes e Rt realizados! TweetsCount = ${tweetsCount}`);
 }
 
 Start();
